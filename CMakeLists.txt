@@ -53,8 +53,8 @@ include_directories(
 )
 set (LIBS ${PYTHON_LIBRARIES} /usr/lib/x86_64-linux-gnu/libpython2.7.so)
 
-add_executable(dense_reconstruction src/dense_reconstruction.cpp src/utils.cpp ${LIBELAS_SRC_FILES})
-target_link_libraries(dense_reconstruction ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} "-lpopt")
+#add_executable(dense_reconstruction src/dense_reconstruction.cpp src/utils.cpp ${LIBELAS_SRC_FILES})
+#target_link_libraries(dense_reconstruction ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} "-lpopt")
 
 add_executable(stereo_app src/stereo_app.cpp src/utils.cpp src/DepthReconstructor.cpp ${LIBELAS_SRC_FILES})
 target_link_libraries(stereo_app ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} glog gflags)
