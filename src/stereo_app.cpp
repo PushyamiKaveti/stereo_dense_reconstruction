@@ -39,7 +39,7 @@ DEFINE_int32(calib_width, 640, "Calibration image width");
 DEFINE_int32(calib_height, 480, "Calibration image height");
 
 DEFINE_bool(debug, false, "Debug Mode");
-DEFINE_bool(is_ros, true, "Is it a ros node or images saved on disk");
+DEFINE_bool(is_ros, true, "publish the depth to ROS or save images on disk");
 DEFINE_int32(algo, 1, "Which stereo alhorithm to run ELAS =1 , SGBM=2");
 DEFINE_string(output_dir, ".", "directory where the rgb and depth images should be saved");
 DEFINE_bool(color, false, "Should the images be saved in color or mono");
@@ -89,19 +89,6 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
         //sensor_msgs::PointCloud2Ptr points_msg = boost::make_shared<sensor_msgs::PointCloud2>();
         //Mat depth;
         //depthProc->convertToDepthMap(disp, depth);
-
-        std::string depth_path = write_folder+"/depth/" + to_string(msg_left->header.stamp.sec)+ "." + to_string(msg_left->header.stamp.nsec) + ".png";
-        if (boost::filesystem::exists(depth_path))
-            return;
-        ROS_INFO_STREAM(std::to_string(msg_left->header.seq));
-        ROS_INFO_STREAM(msg_left->header.stamp.sec <<"  "<<msg_left->header.stamp.nsec);
-        ROS_INFO_STREAM(msg_right->header.stamp.sec<<"  "<<msg_right->header.stamp.nsec);
-        //depth_path.append();
-        std::string rgb_path;
-        rgb_path.append(write_folder+ "/rgb/"+to_string(msg_left->header.stamp.sec) + "." + to_string(msg_left->header.stamp.nsec) + ".png");
-
-
-        cv::imwrite(depth_path , depthMap);
         Mat img_left_color;
         if(FLAGS_color){
             cv::remap(tmpColor, img_left_color, depthProc->rectMapLeft_x, depthProc->rectMapLeft_y, cv::INTER_LINEAR);
@@ -109,13 +96,30 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
         else{
             cvtColor(depthProc->img1_rect, img_left_color, CV_GRAY2BGR);
         }
+        if(!FLAGS_is_ros){
+            std::string depth_path = write_folder+"/depth/" + to_string(msg_left->header.stamp.sec)+ "." + to_string(msg_left->header.stamp.nsec) + ".png";
+            if (boost::filesystem::exists(depth_path))
+                return;
+            ROS_INFO_STREAM(std::to_string(msg_left->header.seq));
+            ROS_INFO_STREAM(msg_left->header.stamp.sec <<"  "<<msg_left->header.stamp.nsec);
+            ROS_INFO_STREAM(msg_right->header.stamp.sec<<"  "<<msg_right->header.stamp.nsec);
+            //depth_path.append();
+            std::string rgb_path;
+            rgb_path.append(write_folder+ "/rgb/"+to_string(msg_left->header.stamp.sec) + "." + to_string(msg_left->header.stamp.nsec) + ".png");
 
-        cv::imwrite(rgb_path, img_left_color);
-        //pcl_pub.publish(points_msg);
 
-        //sensor_msgs::ImagePtr disp_msg;
-        //disp_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", vdisp).toImageMsg();
-        //dmap_pub.publish(disp_msg);
+            cv::imwrite(depth_path , depthMap);
+            cv::imwrite(rgb_path, img_left_color);
+        }
+        else{
+            //pcl_pub.publish(points_msg);
+
+            sensor_msgs::ImagePtr disp_msg;
+            disp_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", vdisp).toImageMsg();
+            dmap_pub.publish(disp_msg);
+        }
+
+
         waitKey(30);
 
 }
@@ -143,7 +147,7 @@ int main(int argc, char** argv){
     depthProc->init(K_mats[0] , D_mats[0], K_mats[1], D_mats[1],R_mats[1], T_mats[1]);
     write_folder = FLAGS_output_dir;
 
-    if (FLAGS_is_ros){
+   // if (FLAGS_is_ros){
         ros::init(argc, argv, "stereo_reconstruction");
         ros::NodeHandle nh;
         image_transport::ImageTransport it(nh);
@@ -161,7 +165,7 @@ int main(int argc, char** argv){
 
         ros::spin();
 
-    }
+    //}
 
 
     return 0;

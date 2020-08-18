@@ -2,7 +2,7 @@
 
 
 This is a ROS package for real-time 3D reconstruction from stereo images using either [LIBELAS](http://www.cvlibs.net/software/libelas/) 
-or stereo blockmatching from OpenCV , for generating dense disparity maps. The 3D point cloud is also generated and can be visualized on rviz.
+or [stereo block matching](https://docs.opencv.org/3.4/d9/dba/classcv_1_1StereoBM.html) from OpenCV , for generating dense disparity maps. The 3D point cloud is also generated and can be visualized on rviz.
 
 - Author: [Pushyami Kaveti](http://pushyamikaveti.github.io/)
 
@@ -16,74 +16,48 @@ or stereo blockmatching from OpenCV , for generating dense disparity maps. The 3
 
 ## Stereo Calibration
 
-A calibrated pair of cameras is required for stereo rectification and calibration files should be stored in a `.yml` file. 
-[This repository](https://github.com/sourishg/stereo-calibration) contains all the tools and instructions to calibrate stereo cameras.
-
-Please see a sample calibration file in the `calibration/` folder.
+The intrinsic and extrinsic calibration parameters of a pair of cameras should be stored in a `.yml` file. A stereo pair can be calibrated
+using a checkerboard rig using [openCV](https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html) or 
+[Kalibr](https://github.com/ethz-asl/kalibr). A sample calibration file is provided in the calibration folder
 
 ## Compiling
 
-Clone the repository:
+Clone the repository of the ROS package in src/ folder of a catkin workspace :
 
 ```bash
-$ git clone https://github.com/umass-amrl/stereo_dense_reconstruction
+$cd catkin_ws/src
+$ git clone  https://github.com/PushyamiKaveti/stereo_dense_reconstruction.git
 ```
 
-For compiling the ROS package, `rosbuild` is used. Add the path of the ROS package to `ROS_PACKAGE_PATH` and put the following line in your `.bashrc` file. 
-Replace `PATH` by the actual path where you have cloned the repository:
+and execute 
+```bash
+$cd catkin_ws 
+$catkin_make 
+``` 
+
+
+## Running the stereo app
 
 ```bash
-$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH
-```
-
-Execute the `build.sh` script:
-
-```bash
-$ cd stereo_dense_reconstruction
-$ chmod +x build.sh
-$ ./build.sh
-```
-
-## Running Dense 3D Reconstruction
-
-```bash
-$ ./bin/dense_reconstruction [OPTION...]
+$ ./bin/stereo_app [OPTION...]
 ```
 
 ```bash
 Usage: dense_reconstruction [OPTION...]
-  -l, --left_topic=STR       Left image topic name
-  -r, --right_topic=STR      Right image topic name
-  -c, --calib_file=STR       Stereo calibration file name
-  -w, --calib_width=NUM      Calibration image width
-  -h, --calib_height=NUM     Calibration image height
-  -u, --out_width=NUM        Rectified image width
-  -v, --out_height=NUM       Rectified image height
-  -d, --debug=NUM            Set d=1 for cam to robot frame calibration
+   --left_topic=STR       Left image topic name
+   --right_topic=STR      Right image topic name
+   --calib_file=STR       Stereo calibration file name
+   --calib_width=NUM      Calibration image width
+   --calib_height=NUM     Calibration image height
+   --is_ros=bool          is the dense reconstruction info published to ROS or saved to disk.
+   --algo=NUM             which stereo algorithm to use ELAS=1, SGBM=2    
+   --output_dir=STR       directory where the rgb and depth images should be saved      
+   --color                for color or mono images
+   --debug=bool           Set true for debug mode
 ```
-
-This node outputs the dense disparity map as a grayscale image on the topic `/camera/left/disparity_map` and the corresponding point cloud on the topic 
-`/camera/left/point_cloud`.
-
-A sample dataset can be found [here](https://greyhound.cs.umass.edu/owncloud/index.php/s/3g9AwCSkGi6LznK).
-
-## Point Cloud Transformation
-
-The point cloud can be viewed on `rviz` by running:
-
-```bash
-$ rosrun rviz rviz
-```
-
-To transform the point cloud to a different reference frame, the `XR` and `XT` matrices (rotation and translation) in the calibration file need to be changed. 
-This can be done real-time by the running:
-
-```bash
-$ rosrun rqt_reconfigure rqt_reconfigure
-```
-
-If you change the Euler Angles in `rqt_reconfigure` you should be able to see the point cloud transform. Don't forget to set `d=1` when running the 
-`dense_reconstruction` node. This prints out the new transformation matrices as you transform the point cloud.
+if is_ros flag is true dense disparity grayscale image is published on the topic `/camera/left/disparity_map` and the corresponding point cloud on the topic 
+`/camera/left/point_cloud`. Otherwise the depth map is saved onto disk under output_dir/depth folder. The depth map written to disk is not 
+the disparity, but the actual depth image scaled by 5000.
 
 ## License
 

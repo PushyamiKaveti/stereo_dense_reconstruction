@@ -38,21 +38,6 @@ T2: !!opencv-matrix
    dt: d
    data: [ -0.1654672786853438,  -0.0015684135049010895,   0.002875782916669147]
 
-XR: !!opencv-matrix
-   rows: 3
-   cols: 3
-   dt: d
-   data: [ 0.00080,   0.00080,   1.00000,
-          -1.00000,   0.00000,   0.00080,
-           0.00000,  -1.00000,   0.00080 ]
-XT: !!opencv-matrix
-   rows: 3
-   cols: 1
-   dt: d
-   data: [ -4.0,
-           0.0,
-           1.7 ]
-
 #-l
 #/camera_array/cam2/image_raw
 #-r
