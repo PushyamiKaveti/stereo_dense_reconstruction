@@ -59,6 +59,7 @@ if is_ros flag is true dense disparity grayscale image is published on the topic
 `/camera/left/point_cloud`. Otherwise the depth map is saved onto disk under output_dir/depth folder. The depth map written to disk is not 
 the disparity, but the actual depth image scaled by 5000.
 
+A sample rosbag and the corresponding calibration file can be found [here](https://drive.google.com/file/d/1S2Kq1t5Ju_4Ok9CvU_92R6DJEumm26Lh/view?usp=sharing)
 ## License
 
 This software is released under the [GNU GPL v3 license](LICENSE).
