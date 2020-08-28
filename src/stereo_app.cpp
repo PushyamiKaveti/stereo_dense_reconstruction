@@ -22,7 +22,7 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/Image.h"
-
+#include <sys/stat.h>
 
 #include "utils.h"
 #include "DepthReconstructor.h"
@@ -39,7 +39,7 @@ DEFINE_int32(calib_width, 640, "Calibration image width");
 DEFINE_int32(calib_height, 480, "Calibration image height");
 
 DEFINE_bool(debug, false, "Debug Mode");
-DEFINE_bool(is_ros, true, "publish the depth to ROS or save images on disk");
+DEFINE_bool(is_ros, false, "publish the depth to ROS or save images on disk");
 DEFINE_int32(algo, 1, "Which stereo alhorithm to run ELAS =1 , SGBM=2");
 DEFINE_string(output_dir, ".", "directory where the rgb and depth images should be saved");
 DEFINE_bool(color, false, "Should the images be saved in color or mono");
@@ -97,16 +97,17 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
             cvtColor(depthProc->img1_rect, img_left_color, CV_GRAY2BGR);
         }
         if(!FLAGS_is_ros){
-            std::string depth_path = write_folder+"/depth/" + to_string(msg_left->header.stamp.sec)+ "." + to_string(msg_left->header.stamp.nsec) + ".png";
+
+            mkdir(write_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            std::string depth_path = pathJoin(write_folder, "depth/" + to_string(msg_left->header.stamp.sec)+ "." + to_string(msg_left->header.stamp.nsec) + ".png");
+            cout<<depth_path<<endl;
             if (boost::filesystem::exists(depth_path))
                 return;
             ROS_INFO_STREAM(std::to_string(msg_left->header.seq));
             ROS_INFO_STREAM(msg_left->header.stamp.sec <<"  "<<msg_left->header.stamp.nsec);
             ROS_INFO_STREAM(msg_right->header.stamp.sec<<"  "<<msg_right->header.stamp.nsec);
             //depth_path.append();
-            std::string rgb_path;
-            rgb_path.append(write_folder+ "/rgb/"+to_string(msg_left->header.stamp.sec) + "." + to_string(msg_left->header.stamp.nsec) + ".png");
-
+            std::string rgb_path = pathJoin(write_folder, "rgb/"+to_string(msg_left->header.stamp.sec) + "." + to_string(msg_left->header.stamp.nsec) + ".png");
 
             cv::imwrite(depth_path , depthMap);
             cv::imwrite(rgb_path, img_left_color);
