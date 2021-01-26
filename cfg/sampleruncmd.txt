@@ -1,0 +1,14 @@
+--left_topic
+/camera_array/cam0/image_raw
+--right_topic
+/camera_array/cam1/image_raw
+--calib_file
+/home/auv/datasets/07_10_2020_indoor_isec/calibration/07_10_2020_isec_indoor_stereo_app.yml
+--calib_width
+720
+--calib_height
+540
+--output_dir
+/home/auv/datasets/07_10_2020_indoor_isec/calibration
+--color
+true

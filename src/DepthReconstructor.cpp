@@ -17,6 +17,7 @@ void DepthReconstructor::init(Mat K1, Mat D1, Mat K2, Mat D2, Mat Rot, Mat trans
     cout<<rectLeft;
     cout<<"\nRECTIFY Mat-right:";
     cout<<rectRight;
+    cout<<"\n";
     initUndistortRectifyMap(K1 , D1, rectLeft ,projLeft, img_size, CV_32FC1 , rectMapLeft_x, rectMapLeft_y);
     initUndistortRectifyMap(K2 ,D2, rectRight ,projRight, img_size, CV_32FC1 , rectMapRight_x, rectMapRight_y);
 

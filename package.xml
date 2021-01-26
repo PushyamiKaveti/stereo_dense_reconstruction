@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   
-  <name>stereo_dense_reconstruction</name>
+  <name>stereo_reconstruction</name>
   <version>1.0.0</version>
-  <description>The stereo_dense_reconstruction package</description>
+  <description>The stereo_reconstruction package</description>
   
-  <maintainer email="sourishg@iitkgp.ac.in">Sourish Ghosh</maintainer>
+  <maintainer email="kaveti.p@northeastern.edu">Pushyami Kaveti</maintainer>
 
   <license>GPL</license>
 

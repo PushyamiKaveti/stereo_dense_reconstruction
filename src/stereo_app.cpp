@@ -61,9 +61,10 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
 
         Mat tmpL = cv_bridge::toCvShare(msg_left, "mono8")->image;
         Mat tmpR = cv_bridge::toCvShare(msg_right, "mono8")->image;
-        Mat tmpColor;
+        Mat tmpColorLeft, tmpColorRight;
         if (FLAGS_color){
-            tmpColor = cv_bridge::toCvShare(msg_left, "bgr8")->image;
+            tmpColorLeft = cv_bridge::toCvShare(msg_left, "bgr8")->image;
+            tmpColorRight = cv_bridge::toCvShare(msg_right, "bgr8")->image;
         }
 
         if (tmpL.empty() || tmpR.empty())
@@ -89,17 +90,18 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
         //sensor_msgs::PointCloud2Ptr points_msg = boost::make_shared<sensor_msgs::PointCloud2>();
         //Mat depth;
         //depthProc->convertToDepthMap(disp, depth);
-        Mat img_left_color;
+        Mat img_left_color, img_right_color;
         if(FLAGS_color){
-            cv::remap(tmpColor, img_left_color, depthProc->rectMapLeft_x, depthProc->rectMapLeft_y, cv::INTER_LINEAR);
+            cv::remap(tmpColorLeft, img_left_color, depthProc->rectMapLeft_x, depthProc->rectMapLeft_y, cv::INTER_LINEAR);
+            cv::remap(tmpColorRight, img_right_color, depthProc->rectMapRight_x, depthProc->rectMapRight_y, cv::INTER_LINEAR);
         }
         else{
             cvtColor(depthProc->img1_rect, img_left_color, CV_GRAY2BGR);
+            cvtColor(depthProc->img2_rect, img_right_color, CV_GRAY2BGR);
         }
         if(!FLAGS_is_ros){
-
-            mkdir(write_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            std::string depth_path = pathJoin(write_folder, "depth/" + to_string(msg_left->header.stamp.sec)+ "." + to_string(msg_left->header.stamp.nsec) + ".png");
+            string stamp_sec=to_string(msg_left->header.stamp.toNSec());
+            std::string depth_path = pathJoin(write_folder, "depth/" + stamp_sec + ".png");
             cout<<depth_path<<endl;
             if (boost::filesystem::exists(depth_path))
                 return;
@@ -107,10 +109,12 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
             ROS_INFO_STREAM(msg_left->header.stamp.sec <<"  "<<msg_left->header.stamp.nsec);
             ROS_INFO_STREAM(msg_right->header.stamp.sec<<"  "<<msg_right->header.stamp.nsec);
             //depth_path.append();
-            std::string rgb_path = pathJoin(write_folder, "rgb/"+to_string(msg_left->header.stamp.sec) + "." + to_string(msg_left->header.stamp.nsec) + ".png");
+            std::string rgb_path = pathJoin(write_folder, "rgb/"+stamp_sec+ ".png");
+            std::string rgb2_path = pathJoin(write_folder, "rgb2/"+stamp_sec+ ".png");
 
             cv::imwrite(depth_path , depthMap);
             cv::imwrite(rgb_path, img_left_color);
+            cv::imwrite(rgb2_path, img_right_color);
         }
         else{
             //pcl_pub.publish(points_msg);
@@ -164,6 +168,15 @@ int main(int argc, char** argv){
         dmap_pub = it.advertise("/camera/left/disparity_map", 1);
         pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/camera/left/point_cloud",1);
 
+        if(!FLAGS_is_ros) {
+            mkdir(write_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            std::string depth_folder = pathJoin(write_folder, "depth");
+            std::string rgb_folder = pathJoin(write_folder, "rgb");
+            std::string rgb2_folder = pathJoin(write_folder, "rgb2");
+            mkdir(depth_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            mkdir(rgb_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            mkdir(rgb2_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        }
         ros::spin();
 
     //}
