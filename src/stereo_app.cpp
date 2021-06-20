@@ -120,7 +120,7 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
             //pcl_pub.publish(points_msg);
 
             sensor_msgs::ImagePtr disp_msg;
-            disp_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", vdisp).toImageMsg();
+            disp_msg = cv_bridge::CvImage(msg_left->header, "mono8", vdisp).toImageMsg();
             dmap_pub.publish(disp_msg);
         }
 
