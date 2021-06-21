@@ -10,9 +10,11 @@ or [stereo block matching](https://docs.opencv.org/3.4/d9/dba/classcv_1_1StereoB
 
 - [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
 - [cmake](http://www.cmake.org/cmake/resources/software.html)
-- [gflags](https://github.com/gflags/gflags)
+- [gflags](https://github.com/gflags/gflags)  ``` $ apt install libgflags-dev  ```
+- glog ``` $ apt install libgoogle-glog-dev  ```
 - [Boost](http://www.boost.org/)
 - [OpenCV == 3.3.1 ](https://github.com/opencv/opencv) 
+- Popt ``` $ apt install libpopt-dev ```
 
 ## Stereo Calibration
 
@@ -33,7 +35,7 @@ and execute
 ```bash
 $cd catkin_ws 
 $catkin_make 
-``` 
+```
 
 
 ## Running the stereo app
