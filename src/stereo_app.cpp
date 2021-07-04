@@ -120,7 +120,7 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
             //pcl_pub.publish(points_msg);
 
             sensor_msgs::ImagePtr disp_msg;
-            disp_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", vdisp).toImageMsg();
+            disp_msg = cv_bridge::CvImage(msg_left->header, "mono8", vdisp).toImageMsg();
             dmap_pub.publish(disp_msg);
         }
 
@@ -146,7 +146,6 @@ int main(int argc, char** argv){
     cout<<FLAGS_calib_file<<endl;
     // read all the matrices K, D, R, T
     read_calib_params(calib_file,K_mats,D_mats,R_mats,T_mats,P_mats);
-
     //create stereo object
     depthProc = new DepthReconstructor(FLAGS_algo,  calib_img_size, true, FLAGS_debug);
     depthProc->init(K_mats[0] , D_mats[0], K_mats[1], D_mats[1],R_mats[1], T_mats[1]);
@@ -164,7 +163,7 @@ int main(int argc, char** argv){
         message_filters::Synchronizer<SyncPolicy> sync(SyncPolicy(1), sub_img_left, sub_img_right);
         sync.registerCallback(boost::bind(&imgCallback, _1, _2));
 
-
+        //left_rect_pub = it.advertiseCamera("/frl_uas9/camera_array/cam0/image_raw")
         dmap_pub = it.advertise("/camera/left/disparity_map", 1);
         pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/camera/left/point_cloud",1);
 

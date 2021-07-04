@@ -1,3 +1,7 @@
 *.bag
 *.zip
 /data
+/bin
+/build
+/calibration/projects
+
