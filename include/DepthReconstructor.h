@@ -20,8 +20,7 @@ using namespace cv;
 
 enum Algo {
     ELAS = 1,
-    BLOCK_MATCH = 2,
-
+    BLOCK_MATCH = 2
 };
 
 class DepthReconstructor {

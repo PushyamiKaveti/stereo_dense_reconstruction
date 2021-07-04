@@ -15,19 +15,16 @@ Mat build_Rt(Mat R, Mat t) {
         }
         Rt(i,3) = t.at<double>(0,i);
     }
-
     return Rt;
 
 }
 void read_calib_params(FileStorage& calib_file, vector<Mat>& K_mats , vector<Mat>& D_mats, vector<Mat>& R_mats, vector<Mat>& T_mats, vector<Mat>& P_mats) {
-
     Mat k_temp, d_temp, r_temp, t_temp, p_temp;
     K_mats.clear();
     D_mats.clear();
     R_mats.clear();
     T_mats.clear();
     P_mats.clear();
-
     // K Matrices
     calib_file["K1"] >> k_temp;
     K_mats.push_back(k_temp.clone());
@@ -49,7 +46,6 @@ void read_calib_params(FileStorage& calib_file, vector<Mat>& K_mats , vector<Mat
 
     calib_file["D2"] >> d_temp;
     D_mats.push_back(d_temp.clone());
-
     /*calib_file["D3"] >> d_temp;
     D_mats.push_back(d_temp.clone());
 
@@ -76,15 +72,13 @@ void read_calib_params(FileStorage& calib_file, vector<Mat>& K_mats , vector<Mat
     P_mats.push_back(p_temp.clone());
 
     //creating the chain
-    calib_file["R2"] >> r_temp;
-    calib_file["T2"] >> t_temp;
-
+    calib_file["R"] >> r_temp;
+    calib_file["T"] >> t_temp;
     Rt = build_Rt(r_temp.clone(), t_temp.clone());
     p_temp = K_mats[1]*Rt;
     R_mats.push_back(r_temp.clone());
     T_mats.push_back(t_temp.clone());
     P_mats.push_back(p_temp.clone());
-
 
 }
 

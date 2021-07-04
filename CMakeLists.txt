@@ -21,6 +21,7 @@ find_package(PythonLibs 2.7)
 #catkin
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rosbag
   rospy
   std_msgs
   cv_bridge
@@ -28,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   dynamic_reconfigure
   geometry_msgs
+  message_filters
 )
 # Dynamic reconfigure support
 generate_dynamic_reconfigure_options(cfg/CamToRobotCalibParams.cfg)
@@ -53,8 +55,11 @@ include_directories(
 )
 set (LIBS ${PYTHON_LIBRARIES} /usr/lib/x86_64-linux-gnu/libpython2.7.so)
 
-#add_executable(dense_reconstruction src/dense_reconstruction.cpp src/utils.cpp ${LIBELAS_SRC_FILES})
-#target_link_libraries(dense_reconstruction ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} "-lpopt")
+add_executable(dense_reconstruction src/dense_reconstruction.cpp src/utils.cpp ${LIBELAS_SRC_FILES})
+target_link_libraries(dense_reconstruction ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} "-lpopt")
 
 add_executable(stereo_app src/stereo_app.cpp src/utils.cpp src/DepthReconstructor.cpp ${LIBELAS_SRC_FILES})
 target_link_libraries(stereo_app ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} glog gflags)
+
+add_executable(stereo_offline_bag src/stereo_offline_bag.cpp src/utils.cpp src/DepthReconstructor.cpp src/depth_uncalibrated.cpp ${LIBELAS_SRC_FILES})
+target_link_libraries(stereo_offline_bag ${OpenCV_LIBS}  ${catkin_LIBRARIES}  ${Boost_GENERAL} glog gflags)
